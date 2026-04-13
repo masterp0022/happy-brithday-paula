@@ -19,18 +19,19 @@ body {
 #intro {
     position: absolute;
     width: 100%;
-    top: 30%;
+    top: 25%;
     z-index: 10;
+    padding: 0 20px;
 }
 
 h1 {
-    font-size: 2.2rem;
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
 }
 
 /* Buttons */
 button {
-    padding: 12px 25px;
-    font-size: 18px;
+    padding: 12px 20px;
+    font-size: clamp(14px, 3vw, 18px);
     border: none;
     border-radius: 10px;
     margin: 10px;
@@ -78,13 +79,13 @@ button {
     position: absolute;
     top: 40%;
     width: 100%;
-    font-size: 24px;
+    font-size: clamp(18px, 4vw, 26px);
     padding: 0 20px;
 }
 
-/* FINAL BIG TITLE */
+/* FINAL TITLE */
 #bigTitle {
-    font-size: 60px;
+    font-size: clamp(40px, 10vw, 70px);
     font-weight: bold;
     color: #ff4da6;
     text-shadow: 0 0 20px #ff4da6, 0 0 40px #ff99cc;
@@ -93,16 +94,12 @@ button {
 }
 
 @keyframes glow {
-    from {
-        text-shadow: 0 0 10px #ff4da6;
-    }
-    to {
-        text-shadow: 0 0 30px #ff99cc, 0 0 60px #ff4da6;
-    }
+    from { text-shadow: 0 0 10px #ff4da6; }
+    to { text-shadow: 0 0 40px #ff99cc, 0 0 60px #ff4da6; }
 }
 
 #finalText {
-    font-size: 24px;
+    font-size: clamp(18px, 4vw, 26px);
 }
 </style>
 </head>
@@ -128,13 +125,35 @@ const bg = document.getElementById("bg");
 const music = document.getElementById("music");
 const messageBox = document.getElementById("message");
 
-/* NO runs away */
-no.addEventListener("mouseover", () => {
-    const maxX = window.innerWidth - 100;
-    const maxY = window.innerHeight - 50;
+/* Move NO button safely */
+function moveNoButton() {
+    const maxX = window.innerWidth - no.offsetWidth;
+    const maxY = window.innerHeight - no.offsetHeight;
 
     no.style.left = Math.random() * maxX + "px";
     no.style.top = Math.random() * maxY + "px";
+}
+
+/* Desktop hover */
+no.addEventListener("mouseover", moveNoButton);
+
+/* Mobile tap */
+no.addEventListener("click", (e) => {
+    e.preventDefault();
+    moveNoButton();
+});
+
+/* Run from mouse pointer */
+document.addEventListener("mousemove", (e) => {
+    const rect = no.getBoundingClientRect();
+    const distance = Math.hypot(
+        e.clientX - (rect.left + rect.width / 2),
+        e.clientY - (rect.top + rect.height / 2)
+    );
+
+    if (distance < 100) {
+        moveNoButton();
+    }
 });
 
 /* YES click */
@@ -186,7 +205,6 @@ function showMessages() {
 function typeText(text) {
     let i = 0;
 
-    /* FINAL MESSAGE */
     if (index === messages.length - 1) {
         messageBox.innerHTML = `
         <div id="bigTitle">HAPPY BIRTHDAY 🎉</div>
@@ -199,9 +217,7 @@ function typeText(text) {
             finalText.innerHTML += text.charAt(i);
             i++;
 
-            if (i >= text.length) {
-                clearInterval(typing);
-            }
+            if (i >= text.length) clearInterval(typing);
         }, 40);
 
     } else {
